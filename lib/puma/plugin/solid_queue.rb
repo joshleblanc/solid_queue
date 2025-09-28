@@ -13,7 +13,7 @@ Puma::Plugin.create do
 
   def start(launcher)
     @log_writer = launcher.log_writer
-    @puma_pid = $
+    @puma_pid = $$
 
     if launcher.options[:solid_queue_mode] == :async
       start_async(launcher)
