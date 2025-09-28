@@ -110,11 +110,16 @@ module SolidQueue
       end
 
       def check_and_replace_terminated_threads
+        terminated_threads = {}
         threads.each do |thread, (process, configured_process)|
           unless thread.alive?
-            threads.delete(thread)
-            start_process(configured_process)
+            terminated_threads[thread] = configured_process
           end
+        end
+
+        terminated_threads.each do |thread, configured_process|
+          threads.delete(thread)
+          start_process(configured_process)
         end
       end
 
