@@ -18,45 +18,6 @@ module SolidQueue
         end
 
         thread = Thread.new { process_instance.start }
-        threads[thread] = configured_process
-      end
-
-      def terminate_gracefully
-        SolidQueue.instrument(:graceful_termination, process_id: process_id, supervisor_pid: ::Process.pid, supervised_processes: supervised_processes) do |payload|
-          processes.each(&:stop)
-
-          Timer.wait_until(SolidQueue.shutdown_timeout, -> { all_threads_terminated? }) do
-            # No-op, we just wait
-          end
-
-          unless all_threads_terminated?
-            payload[:shutdown_timeout_exceeded] = true
-            terminate_immediately
-          end
-        end
-      end
-
-      def terminate_immediately
-        SolidQueue.instrument(:immediate_termination, process_id: process_id, supervisor_pid: ::Process.pid, supervised_processes: supervised_processes) do
-          threads.keys.each(&:kill)
-        end
-      end
-
-      attr_reader :threads
-
-      def start_processes
-        @threads = {}
-
-        configuration.configured_processes.each { |configured_process| start_process(configured_process) }
-      end
-
-      def start_process(configured_process)
-        process_instance = configured_process.instantiate.tap do |instance|
-          instance.supervised_by process
-          instance.mode = :async
-        end
-
-        thread = Thread.new { process_instance.start }
         threads[thread] = [ process_instance, configured_process ]
       end
 
