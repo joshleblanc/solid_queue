@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require "solid_queue/fork_supervisor"
-require "solid_queue/async_supervisor"
-
 module SolidQueue
   class Supervisor < Processes::Base
     include LifecycleHooks
