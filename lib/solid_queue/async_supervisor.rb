@@ -17,7 +17,14 @@ module SolidQueue
           instance.mode = :async
         end
 
-        thread = Thread.new { process_instance.start }
+        thread = Thread.new do
+          begin
+            process_instance.start
+          rescue Exception => e
+            puts "Error in thread: #{e.message}"
+            puts e.backtrace
+          end
+        end
         threads[thread] = [ process_instance, configured_process ]
       end
 
