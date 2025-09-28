@@ -83,7 +83,7 @@ Puma::Plugin.create do
       loop do
         if send(process_dead)
           log message
-          Process.kill(:INT, $)
+          Process.kill(:INT, $$)
           break
         end
         sleep 2
